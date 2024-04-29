@@ -13,8 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -40,8 +38,7 @@ public class UsersController
     @GetMapping(path = "{userId}")
     public DataResponseDto getOne(@PathVariable UUID userId)
     {
-        Optional<User> user = usersService.getOne(userId);
-        return new DataResponseDto(user.isPresent() ? user : List.of());
+        return new DataResponseDto(usersService.getOne(userId));
     }
 
     @GetMapping(path = "search")

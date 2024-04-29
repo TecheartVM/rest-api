@@ -36,12 +36,12 @@ public class UsersService
         return createResponsePage(USERS, ofs, lim, url);
     }
 
-    public Optional<User> getOne(UUID userId) throws ApiRequestException
+    public User getOne(UUID userId) throws ApiRequestException
     {
         for (User u : USERS)
         {
             if (userId.equals(u.getId()))
-                return Optional.of(u);
+                return u;
         }
 
         throw ApiRequestException.notFound("No user found on given id.");
@@ -66,7 +66,7 @@ public class UsersService
         return result;
     }
 
-    public Optional<User> add(@Nullable User user) throws ApiRequestException
+    public User add(@Nullable User user) throws ApiRequestException
     {
         if (user == null)
             throw ApiRequestException.badRequest("Can't create new user: no valid user data provided.");
@@ -87,7 +87,7 @@ public class UsersService
         }
 
         UUID id = UUID.randomUUID();
-        User u = new User(
+        User result = new User(
                 id,
                 user.getEmail(),
                 user.getFirstName(),
@@ -96,9 +96,9 @@ public class UsersService
                 user.getAddress(),
                 user.getPhoneNumber()
         );
-        USERS.add(u);
+        USERS.add(result);
 
-        return Optional.of(u);
+        return result;
     }
 
     public void update(@Nullable User user) throws ApiRequestException
@@ -124,9 +124,7 @@ public class UsersService
         if (data == null)
             throw ApiRequestException.badRequest("Can't update user: no valid user data provided.");
 
-        User original = getOne(userId).orElse(null);
-        if (original == null)
-            throw ApiRequestException.notFound("No user found on given id.");
+        User original = getOne(userId);
 
         User user = data.patchUser(original);
         update(user);
@@ -245,11 +243,18 @@ public class UsersService
         return baseUrl + "?offset=" + offset + "&limit=" + limit;
     }
 
-    private final List<User> USERS = new ArrayList<>();
+    /**
+     * Used only for the simulation of a repository
+     * because of persistence layer is absent in this demo app.
+     * */
+    private List<User> USERS = new ArrayList<>();
 
+    /**
+     * Used only for testing purposes
+     * because of persistence layer is absent in this demo app.
+     * */
+    public void initUsersList(List<User> data)
     {
-        USERS.add(new User(UUID.randomUUID(), "bob@gmail.com", "Bob", "Washington", LocalDate.of(1996, 6, 13)));
-        USERS.add(new User(UUID.randomUUID(), "john@gmail.com", "John", "Warner", LocalDate.of(2008, 10, 2)));
-        USERS.add(new User(UUID.randomUUID(), "mari@gmail.com", "Mari", "Swanson", LocalDate.of(2001, 3, 26)));
+        USERS = data;
     }
 }
